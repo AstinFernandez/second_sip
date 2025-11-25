@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 app.use(session({
-    secret: process.eventNames.SESSION_SECRET, //Create id for the session cookie.
+    secret: process.env.SESSION_SECRET, //Create id for the session cookie.
     resave: false, //Do not save to session store an unmodified session.
     saveUnitialized: false, //Same to setting above.
     cookies: {
@@ -22,13 +22,13 @@ app.use(session({
     }
 }));
 
-app.use(express.static(path.join(__dirname, 'Frontend')));
+app.use('/', express.static(path.join(__dirname, 'Frontend', 'Index')));
 
 const pool = mysql.createPool({
-    host: process.env.DB.HOST,
-    user: process.env.DB.USER,
-    password: process.env.DB.PASSWORD,
-    database: process.env.DB.NAME,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10
 });
@@ -38,14 +38,15 @@ async function initDatabase(){
         const connection = await pool.getConnection();
         await connection.query(`
             CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            email VARCHAR(100) UNIQUE NOT NULL,
-            password_hash VARCHAR(255) UNIQUE NOT NULL,
-            role ENUM('admin', 'user') DEFAULT 'user',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            last_login TIMESTAMP NULL`
-        );
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) UNIQUE NOT NULL,
+                role ENUM('admin', 'user') DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP NULL
+            )
+        `);
         console.log('✔️ Database initialized');
         connection.release();
     }
@@ -137,4 +138,84 @@ app.get('/api/check-auth', isAuthenticated, async(req, res) =>{
             user: users[0]
         });
     }
+    catch(error){
+        res.status(500).json({error: 'Auth check failed.'});
+    }
+});
+
+app.post('/api/admin/register', isAuthenticated, isAdmin, async(req, res) =>{
+    try{
+        //Validate all fields are filled.
+        const {username, email, password, role} = req.body;
+        if(!username || !email || !password || !role){
+            return res.status(500).json({error: 'All fields are required.'});
+        }
+        if(password.length < 6){
+            return res.status(400).json({error: 'Password must have atleast 6 characters.'});
+        }
+        
+        //Validate that the username/email are not already in use.
+        const [existing] = await pool.query('SELECT * FROM users WHERE username = ? OR email = ?', [username, email]);
+        if(existing.length > 0){
+            return res.status(409).json({error: 'Username or email already exists.'});
+        }
+        
+        //Saving details of new user to database.
+        const hash = await bcrypt.hash(password, 10); //result is hash will contain a long random-looking string which is safe to store in the database.
+        const userRole = role == 'admin'? 'admin':'user'; //ternary operation used ?: First checks if role equals admin; if it doesn't assigns role to user.
+        const [result] = await pool.query('INSERT INTO users (username, email, password-hash, role) VALUES (?,?,?,?' [username, email, hash, role]);
+        return res.status(201).json({
+            message: 'User created successfully.',
+            userId: result.insertId,
+            username: username,
+            role: userRole,
+        });
+    }
+    catch(error){
+        console.error('Register error: ', error);
+        return res.status(500).json({error: 'Registration failed.'});
+    }
+});
+
+//Check users and their role
+app.get('/api/admin/users', isAuthenticated, isAdmin, async(req, res) =>{
+    try{
+        const [users] = await pool.query('SELECT username, email, role, created_At, last_login FROM users ORDER BY created_at DESC');
+        res.json({users});
+    }
+    catch(error){
+        res.status(500).json({error: 'Failed to fetch users.'});
+    }
+});
+
+//Delete users
+app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async(req, res) =>{
+    try{
+        const userId = req.params.id; //code grabs the id from the request URL
+        if(parseInt(userId) == req.session.userId){ //Checks if that id equals the logged-in user's own id
+            res.status(400).json({error: 'Cannot delete yourself'});
+        }
+
+        //Deleting user from database
+        const result = await pool.query('DELETE FROM users WHERE id = ?', [userId]);
+        if(result.AffectedRows === 0){
+            return res.status(404).json({error: 'User not found.'});
+        }
+        res.json({message: 'User deleted'});
+    }
+    catch(error){
+        res.status(500).json({error: 'Delete failed.'});
+    }
 })
+
+app.listen(PORT, () =>{
+    console.log(`
+        Server Running Successfully!
+        
+        Frontend URL: http://localhost: ${PORT}
+        API URL:      http://localhost:${PORT}/api
+        
+        Open your broweser and go to:
+        http://localhost:${PORT}
+        `);
+});

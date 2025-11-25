@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Ubuntu Sans', sans-serif;
+    box-sizing: border-box;
+}
+
+body{
+    font-size: 18px;
+    font-weight: 500;
+    background-color: #E5E3E6;
+    margin: 2rem;
+}
+
+body.login-active{
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ================== HEADER & LAYOUT ================== */
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 35px;
+    margin-bottom: 100px;
+}
+
+header > .left{
+    margin-left: 85px;
+}
+
+/* Menu Toggle */
+header > .menu-toggle{
+    position: fixed;
+    top: 35px;
+    left: 20px;
+    width: 50px;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgb(0, 0, 0) 100%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 1001;
+    transition: left 0.3s ease;
+}
+
+header > .menu-toggle:hover{
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+header > .menu-toggle.active{
+    left: 300px;
+}
+
+header > button > i{
+    color: white;
+    font-size: 25px;
+}
+
+/* Sidebar */
+header > .sidebar{
+    position: fixed;
+    left: -280px;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+}
+
+header > .sidebar.active{
+    left: 0;
+}
+
+header > .sidebar > .header{
+    margin-left: 23px;
+    margin-top: 23px;
+}
+
+header > .sidebar > .menu-items{
+    display: flex;
+    flex-direction: column;
+    padding: 12px 20px;
+}
+
+header > .sidebar a{
+    text-decoration: none;
+    color: black;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 4px 0;
+}
+
+header > .sidebar a:hover{
+    background: rgba(0, 0, 0, 0.1);
+}
+
+header > .sidebar a > span{
+    margin-left: 14px;
+}
+
+header > .sidebar > .menu-items > .upgrade-section{
+    margin-top: auto;
+    padding-bottom: 30px;
+}
+
+.overlay{
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.overlay.active{
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+header > .loginform{
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+}
+
+header > .loginform.active{
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all !important;
+    user-select: text;
+    z-index: 1000;
+}
+
+header > .loginform > .container{
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+header > .loginform > .container > h1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+header > .loginform .userinput{
+    margin-top: 20px;
+}
+
+header > .loginform .form-group{
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+header > .loginform label{
+    text-align: left;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+header > .loginform input{
+    width: 100%;
+    height: 30px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;   
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+header > .loginform button{
+    width: 100%;
+    padding: 12px;
+    background: lightslategray;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+header > .loginform button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+header > .loginform .error{
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fee;
+    border-radius: 4px;
+    display: none;
+}
+
+header > .loginform .error.show{
+    display: block;
+}
+
+/* Spinner */
+header > .loginform > .container > button i{
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin{
+    from{ transform: rotate(0deg); }
+    to{ transform: rotate(360deg); }
+}
