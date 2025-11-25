@@ -22,7 +22,26 @@ app.use(session({
     }
 }));
 
-app.use('/', express.static(path.join(__dirname, 'Frontend', 'Index')));
+
+//To serve every file inside the frontend folder correctly.
+app.use(express.static(path.join(__dirname, 'Frontend')));
+
+// Clean routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Frontend', 'Index', 'index.html'));
+});
+
+app.get('/sales', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Frontend', 'Sales', 'sales_interface.html'));
+});
+
+app.get('/orders', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Frontend', 'Orders', 'order.html'));
+});
+
+app.get('/analytics', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Frontend', 'Analytics', 'analytics.html'));
+});
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,

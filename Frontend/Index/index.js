@@ -1,6 +1,7 @@
 //Load authorising variables
 const API_URL = `/api`;
 let currentUserRole = null;
+let currentUser = null;
 let authChecked = false;
 
 //Check whether the user is authorised or not
@@ -82,12 +83,28 @@ sidebar.addEventListener('click', (e) =>{
 
 //Check authorisation for user and provide way forward if user is valid or not.
 async function checkAuth(){
+    //If we already know the user is logged in during this browser tab session, skips fetch.
+    const cached = sessionStorage.getItem('currentUser');
+    if(cached){
+        const user = JSON.parse(cached);
+        authChecked = true;
+        document.body.classList.remove('login-active');
+        document.getElementById('loginPage')?.classList.add('hidden');
+        document.getElementById('loginPage')?.classList.remove('active');
+    }
+
+    //First time in this tab.
     try{
         const response = await fetch(`${API_URL}/check-auth`,{
-            credentials: 'inlcude'
+            credentials: 'include'
         });
         if(response.ok){
             const data = await response.json();
+            currentUser = data.user;
+            currentUserRole = currentUser.role || null;
+            sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+            authChecked = true;
+
             document.body.classList.remove('login-active');
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('loginPage').classList.remove('active');
@@ -98,6 +115,9 @@ async function checkAuth(){
     }
     catch(error){
         console.log('Not authenticated.');
+        sessionStorage.removeItem('currentUser');
+        currentUser = null;
+        currentUserRole = null;
         showLoginOverlay();
     }
 }

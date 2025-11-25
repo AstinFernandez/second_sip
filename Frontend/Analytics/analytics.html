@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
+    <link rel="stylesheet" href="/Analytics/analytics.css">
+</head>
+<body>
+    <header>
+        <button class="menu-toggle" id="menuToggle">
+            <i class="ph ph-list"></i>
+        </button>
+
+        <div class="sidebar" id="sidebar">
+            <div class="header">
+                <h3>Sips and Drinks</h3>
+            </div>
+
+            <div class="menu-items">
+                <a href="/Index/index.html" class="top menu-item">
+                    <i class="ph ph-house"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="/Sales/sales_interface.html" class="top menu-item">
+                    <i class="ph ph-sidebar"></i>
+                    <span>Sales Interface</span>
+                </a>
+
+                <a href="/Orders/order.html" class="top menu-item">
+                    <i class="ph ph-hand-deposit"></i>
+                    <span>Order Management</span>
+                </a>
+
+                <a href="/" class="top menu-item">
+                    <i class="ph ph-chart-bar-horizontal"></i>
+                    <span>Analytics</span>
+                </a>
+
+                <div class="upgrade-section">
+                    <a href="/public/settings.html" class="bottom menu-item">
+                        <i class="ph ph-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="left">Analytics</h1> 
+
+        <div class="loginform" id="loginPage">
+            <div class="container">
+                <h1 class="centeralised-title"><i class="ph ph-lock"></i> Secure Login</h1>
+                <p class="subtitle">Authorized Personnel Only</p>
+
+                <div class="userinput">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username" autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button class="page-btn"id="loginBtn" onclick="handleLogin()">Login</button>
+
+                <div class="error" id="loginError"></div>
+                <div class="loading" id="loginLoading" style="display: none;"><i class="ph ph-spinner-gap"></i>Authenticating...</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="maincontent" id="mainContent">
+    </main>
+
+    <script src="/Analytics/analytics.js"></script>
+</body>
+</html>
